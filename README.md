@@ -40,7 +40,7 @@ and reset every day. Do not put sensitive data in the demo. An easy way to test 
 ## Quick Start for Docker Compose
 
 ```sh
-git clone https://github.com/DefectDojo/django-DefectDojo && cd django-DefectDojo && docker compose up
+git clone https://github.com/elysee-01/django-defectdojo && cd django-defectdojo && cp env.template .env && docker compose up
 ```
 
 This quick start guide will do the following

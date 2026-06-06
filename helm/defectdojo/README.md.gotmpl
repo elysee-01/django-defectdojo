@@ -42,8 +42,8 @@ Requirements:
 3. Latest cloned copy of DefectDojo
 
 ```zsh
-git clone https://github.com/DefectDojo/django-DefectDojo
-cd django-DefectDojo
+git clone https://github.com/elysee-01/django-defectdojo
+cd django-defectdojo
 
 minikube start
 minikube addons enable ingress
