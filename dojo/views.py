@@ -16,10 +16,14 @@ from dojo.models import (
     Engagement,
     FileUpload,
     Finding,
+    System_Settings,
     Test,
 )
 from dojo.product_announcements import ErrorPageProductAnnouncement
-from dojo.utils import generate_file_response
+from dojo.utils import (
+    generate_file_response,
+    generate_file_response_from_file_path,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -111,17 +115,40 @@ def manage_files(request, oid, obj_type):
 @login_required
 def protected_serve(request, path, document_root=None, *, show_indexes=False):
     """Serve the file only after verifying the user is supposed to see the file."""
-    file = get_object_or_404(FileUpload, file=path)
-    object_set = list(file.engagement_set.all()) + list(file.test_set.all()) + list(file.finding_set.all())
-    # Determine if there is an object to query permission checks from
-    if len(object_set) == 0:
-        raise Http404
-    # Should only one item (but not sure what type) in the list, so O(n=1)
-    for obj in object_set:
-        if isinstance(obj, (Engagement, Test, Finding)):
-            user_has_permission_or_403(request.user, obj, "view")
+    
+    # Try to find FileUpload first
+    try:
+        file = FileUpload.objects.get(file=path)
+        object_set = list(file.engagement_set.all()) + list(file.test_set.all()) + list(file.finding_set.all())
+        # Determine if there is an object to query permission checks from
+        if len(object_set) == 0:
+            raise Http404
+        # Should only one item (but not sure what type) in the list, so O(n=1)
+        for obj in object_set:
+            if isinstance(obj, (Engagement, Test, Finding)):
+                user_has_permission_or_403(request.user, obj, "view")
 
-    return generate_file_response(file)
+        return generate_file_response(file)
+    except FileUpload.DoesNotExist:
+        pass
+    
+    # Check if it's a System Settings file (company_logo)
+    # Any authenticated user can view company_logo (public branding)
+    if "company_logo" in path:
+        try:
+            system_settings = System_Settings.objects.get(company_logo=path)
+        except System_Settings.DoesNotExist:
+            system_settings = None
+
+        if system_settings and system_settings.company_logo:
+            return generate_file_response_from_file_path(
+                system_settings.company_logo.path,
+                file_name=Path(system_settings.company_logo.name).name,
+                file_size=system_settings.company_logo.size,
+            )
+
+    # If not found in either, return 404
+    raise Http404
 
 
 def access_file(request, fid, oid, obj_type, *, url=False):
