@@ -605,6 +605,16 @@ class System_Settings(models.Model):
             "When turned on, all filter operations in the UI will require string matches rather than ID. "
             "This is a performance enhancement to avoid fetching objects unnecessarily.",
         ))
+    company_name = models.CharField(
+        max_length=200,
+        blank=True,
+        null=True,
+        verbose_name=_("Company Name"))
+    company_logo = models.FileField(
+        upload_to=UniqueUploadNameProvider("company_logo"),
+        verbose_name=_("Company Logo"),
+        blank=True,
+        null=True)
 
     from dojo.middleware import System_Settings_Manager  # noqa: PLC0415 circular import
     objects = System_Settings_Manager()
