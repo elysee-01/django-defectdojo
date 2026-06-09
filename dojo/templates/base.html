@@ -144,8 +144,16 @@
                 <div class="flex items-center h-[var(--dd-topbar-height)] px-4 bg-dd-primary-900 flex-shrink-0">
                     {% block header_logo %}
                         <a href="{% url 'home' %}" class="flex items-center gap-2 min-w-0">
-                            <img src="{% static "dojo/img/favicon.png" %}" alt="DefectDojo" class="w-8 h-8 flex-shrink-0">
-                            <span class="text-lg font-semibold text-white truncate">DefectDojo</span>
+                            {% if system_settings.company_logo %}
+                                <img src="{{ system_settings.company_logo.url }}" 
+                                    alt="{{ system_settings.company_name|default:'DefectDojo' }}" 
+                                    class="w-8 h-8 flex-shrink-0 object-contain">
+                            {% else %}
+                                <img src="{% static 'dojo/img/favicon.png' %}" alt="DefectDojo" class="w-8 h-8 flex-shrink-0">
+                            {% endif %}
+                            <span class="text-lg font-semibold text-white truncate">
+                                {{ system_settings.company_name|default:"DefectDojo" }}
+                            </span>
                         </a>
                     {% endblock %}
                 </div>

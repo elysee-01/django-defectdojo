@@ -40,7 +40,7 @@ class SystemSettingsView(View):
         system_settings: System_Settings,
     ) -> SystemSettingsForm:
         # Set up the args for the form
-        args = [request.POST] if request.method == "POST" else []
+        args = [request.POST, request.FILES] if request.method == "POST" else []
         # Set the initial form args
         kwargs = {
             "instance": system_settings,
